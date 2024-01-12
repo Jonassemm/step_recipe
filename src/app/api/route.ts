@@ -1,7 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import OpenAI from 'openai';
-import { config } from '../../../config.js';
 
 export async function POST(request: Request) {
   // Extract the recipe ID from the request body
@@ -66,7 +65,7 @@ export async function POST(request: Request) {
   }
 
   const openai = new OpenAI({
-    apiKey: config.OPENAI_KEY,
+    apiKey: process.env.OPENAI_KEY,
   });
 
   let userMessage = `Give a detailed step by step instruction how to cook this recipe. Include exact measurements of ingredients in instructions.  Ignore anything that is not a cooking instruction. Don't omit any measurements. Direct answer in markup with this exact format: <step>Chop <b>1</b> onion</step>. Answer in german. ${ingredientsString} Recipe: {${recipe}}`;
