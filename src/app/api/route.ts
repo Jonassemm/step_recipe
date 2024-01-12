@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import OpenAI from 'openai';
-import { config } from '../../../config';
+import { config } from '../../../config.js';
 
 export async function POST(request: Request) {
   // Extract the recipe ID from the request body
