@@ -15,15 +15,20 @@ export default function Instruction(props: InstructionProps) {
   return (
     <li
       className={
-        'flex  my-4 p-8 shadow-md rounded-lg flex-row items-center gap-2 justify-between ' +
+        'flex my-4 px-4 py-6 sm:p-8 shadow-md rounded-lg flex-row items-center gap-2 justify-between ' +
         (checked ? 'bg-gray-100' : 'bg-white ')
       }
       onClick={() => setChecked(!checked)}
     >
       <div className="flex items-center">
-        <span className={'text-4xl font-bold '}>{idx}</span>
+        <div className="w-8 shrink-0">
+          <span className={'text-4xl w-8 pe-2 sm:pe-4 font-bold'}>{idx}</span>
+        </div>
         <div
-          className={'text-lg px-4 ' + (checked ? 'line-through' : '')}
+          className={
+            'sm:text-lg px-2 sm:px-4 border-l border-gray-300 ' +
+            (checked ? 'line-through' : '')
+          }
           dangerouslySetInnerHTML={{ __html: text }}
         />
       </div>

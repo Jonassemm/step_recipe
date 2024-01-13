@@ -15,6 +15,7 @@ export default function Home() {
   const [recipeInstructions, setRecipeInstructions] = useState(Array<string>);
   const [amount, setAmount] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [loadedRecipe, setLoadedRecipe] = useState(false);
   const [error, setError] = useState(String);
 
   const processSteps = (stepsString: string) => {
@@ -29,6 +30,7 @@ export default function Home() {
 
   const handleGenerateInstructions = async () => {
     setLoading(true);
+    setLoadedRecipe(false);
     setError('');
     setRecipeInstructions([]);
 
@@ -38,6 +40,7 @@ export default function Home() {
         body: JSON.stringify({ url: recipeLink, amount: amount }),
       });
       let recipeResult: RecipeResult = await fetchRecipe.json();
+      setLoadedRecipe(true);
 
       let fetchSteps = await fetch('/api/instructions', {
         method: 'POST',
@@ -57,13 +60,15 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24 bg-[#FAFAF8]">
-      <h1 className="text-6xl font-bold">Schritt für Schritt</h1>
-      <h2 className="text-3xl mt-3 text-gray-500">
+    <main className="flex min-h-screen container mx-auto flex-col items-center p-6 pt-14 sm:p-24 ">
+      <h1 className="text-5xl sm:text-6xl font-bold text-center">
+        Schritt für Schritt
+      </h1>
+      <h2 className="text-xl sm:text-3xl mt-3 text-center text-gray-500">
         Jedes Chefkoch Rezept als konkrete Schritt-für-Schritt Anleitung
       </h2>
-      <div className="flex items-center gap-2 mt-14 ">
-        <div className="flex flex-col">
+      <div className="flex flex-col w-full md:flex-row items-center gap-2 mt-8 sm:mt-14">
+        <div className="flex flex-col w-full">
           <label htmlFor="recipeLink" className="text-sm pb-1 text-gray-500">
             Chefkoch Link
           </label>
@@ -73,10 +78,10 @@ export default function Home() {
             value={recipeLink}
             onChange={(e) => setRecipeLink(e.target.value)}
             placeholder="Chefkoch Rezeptlink eingeben"
-            className="px-4 min-w-[400px] h-14 border border-gray-300 rounded-md"
+            className="px-4 w-full sm:min-w-[400px] h-14 border border-gray-300 rounded-md"
           />
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full md:w-fit">
           <label htmlFor="amount" className="text-sm pb-1 text-gray-500">
             Portionen
           </label>
@@ -98,13 +103,13 @@ export default function Home() {
         <button
           disabled={loading}
           onClick={handleGenerateInstructions}
-          className="self-end leading-none h-14 px-4 py-2 bg-[#3B8047] hover:bg-green-900 text-white rounded-md"
+          className="self-end mt-4 sm:mt-0 w-full sm:w-fit leading-none h-14 px-4 py-2 bg-[#3B8047] hover:bg-green-900 text-white rounded-md"
         >
           Anleitung generieren
         </button>
       </div>
       {loading && (
-        <div className="flex pt-14 items-center">
+        <div className="flex flex-col pt-14 items-center">
           <svg
             className="animate-spin w-14 h-14"
             width="800px"
@@ -125,6 +130,15 @@ export default function Home() {
               fill="#000000"
             />
           </svg>
+          <span className="text-gray-600 mt-4">
+            {loadedRecipe ? 'Erstelle Anleitung...' : 'Suche Rezept...'}
+          </span>
+
+          {loadedRecipe && (
+            <span className="text-gray-600 mt-2 text-sm">
+              Dies kann bis zu 1 Minute dauern
+            </span>
+          )}
         </div>
       )}
       {error && (
