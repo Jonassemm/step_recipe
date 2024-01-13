@@ -2,8 +2,6 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import OpenAI from 'openai';
 
-export const runtime = 'edge';
-
 export async function POST(request: Request) {
   // Extract the recipe ID from the request body
   const requestBody = await request.json();
@@ -29,7 +27,7 @@ export async function POST(request: Request) {
     pageResult = (await axios.get(match_url)).data;
   } catch (error) {
     return Response.json({
-      error: 'Could not fetch recipe',
+      error: error,
     });
   }
   const cheerioAPI = cheerio.load(pageResult);
@@ -43,7 +41,8 @@ export async function POST(request: Request) {
       .each((i, element) => {
         let ingredientString = cheerioAPI(element).text().trim();
         ingredientString = ingredientString.replace(/\s\s+/g, ' ');
-        ingredient += ingredientString + ' ';
+        if (ingredientString.length > 0) ingredient += ' ';
+        ingredient += ingredientString;
       });
     ingredients.push(ingredient);
   });
@@ -66,7 +65,12 @@ export async function POST(request: Request) {
     });
   }
 
-  const openai = new OpenAI({
+  return Response.json({
+    ingredients: ingredients,
+    recipe: recipe,
+  });
+
+  /*   const openai = new OpenAI({
     apiKey: process.env.OPENAI_KEY,
   });
 
@@ -97,5 +101,5 @@ export async function POST(request: Request) {
   //return recipe
   return Response.json({
     stepByStepRecipe: chatResponse,
-  });
+  }); */
 }
