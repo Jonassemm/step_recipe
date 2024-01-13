@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@vercel/kv": "^1.0.1",
     "ai": "^2.2.31",
     "axios": "^1.6.5",
     "cheerio": "^1.0.0-rc.12",

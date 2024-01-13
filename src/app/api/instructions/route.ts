@@ -1,5 +1,4 @@
 import OpenAI from 'openai';
-import * as cheerio from 'cheerio';
 import { OpenAIStream, StreamingTextResponse } from 'ai';
 import { NextResponse } from 'next/server';
 

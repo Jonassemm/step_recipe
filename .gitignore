@@ -38,3 +38,5 @@ next-env.d.ts
 #config
 config.js
 .env
+
+.vercel

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { use, useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import * as cheerio from 'cheerio';
 import Instruction from './components/Instruction';
 
