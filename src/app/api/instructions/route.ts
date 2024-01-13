@@ -1,6 +1,8 @@
 import OpenAI from 'openai';
 import * as cheerio from 'cheerio';
 
+export const runtime = 'edge';
+
 export async function POST(request: Request) {
   const requestBody = await request.json();
   const ingredients = requestBody.ingredients;
