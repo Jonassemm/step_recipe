@@ -8,4 +8,6 @@
 
 body {
   background-color: #fafaf8;
+  background-image: url('/background.png');
+  background-size: cover;
 }
