@@ -20,11 +20,11 @@ Open http://localhost:3000 with your browser to see the result.
 
 # Project Structure
 
-`src/app/api/`: Contains the server-side logic for the /instructions and /recipe routes.
-`src/app/components/`: Contains the React components used in the application.
-`src/app/globals.css`: Contains global styles for the application.
-`src/app/layout.tsx`: Contains the layout component for the application.
-`src/app/page.tsx`: Contains the main page component for the application.
+- `src/app/api/`: Contains the server-side logic for the /instructions and /recipe routes.
+- `src/app/components/`: Contains the React components used in the application.
+- `src/app/globals.css`: Contains global styles for the application.
+- `src/app/layout.tsx`: Contains the layout component for the application.
+- `src/app/page.tsx`: Contains the main page component for the application.
 
 # Build With
 
