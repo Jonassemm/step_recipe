@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   // Extract the recipe ID from the request body
@@ -12,9 +13,14 @@ export async function POST(request: Request) {
   let match_url = url.match(regex) || [];
   match_url = match_url[0];
   if (!url || !match_url) {
-    return Response.json({
-      error: 'Invalid URL',
-    });
+    return NextResponse.json(
+      {
+        error: 'Invalid Url',
+      },
+      {
+        status: 500,
+      }
+    );
   }
   if (amount) {
     match_url += '?portionen=' + amount;
@@ -25,9 +31,14 @@ export async function POST(request: Request) {
   try {
     pageResult = (await axios.get(match_url)).data;
   } catch (error) {
-    return Response.json({
-      error: error,
-    });
+    return NextResponse.json(
+      {
+        error: 'Error fetching recipe page',
+      },
+      {
+        status: 500,
+      }
+    );
   }
   const cheerioAPI = cheerio.load(pageResult);
 
@@ -57,9 +68,14 @@ export async function POST(request: Request) {
   recipe = recipe.replace(/\r?\n|\r/g, ' ');
 
   if (!recipe || ingredients.length == 0) {
-    return Response.json({
-      error: 'Invalid Recipe',
-    });
+    return NextResponse.json(
+      {
+        error: 'Error extracting recipe',
+      },
+      {
+        status: 500,
+      }
+    );
   }
 
   return Response.json({
