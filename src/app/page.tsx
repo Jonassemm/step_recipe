@@ -133,7 +133,6 @@ export default function Home() {
           <span className="text-gray-600 mt-4">
             {loadedRecipe ? 'Erstelle Anleitung...' : 'Suche Rezept...'}
           </span>
-
           {loadedRecipe && (
             <span className="text-gray-600 mt-2 text-sm">
               Dies kann bis zu 1 Minute dauern
