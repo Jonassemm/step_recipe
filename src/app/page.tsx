@@ -4,6 +4,17 @@ import React, { use, useState, useEffect } from 'react';
 import * as cheerio from 'cheerio';
 import Instruction from './components/Instruction';
 
+interface RecipeResult {
+  recipe: string;
+  ingredients: Array<string>;
+  error?: string;
+}
+
+interface StepResults {
+  steps: Array<string>;
+  error?: string;
+}
+
 export default function Home() {
   const [recipeLink, setRecipeLink] = useState('');
   const [recipeInstructions, setRecipeInstructions] = useState(Array<string>);
@@ -11,34 +22,38 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(String);
 
-  const handleGenerateInstructions = () => {
+  const handleGenerateInstructions = async () => {
     setLoading(true);
     setError('');
     setRecipeInstructions([]);
-    fetch('/api', {
-      method: 'POST',
-      body: JSON.stringify({ url: recipeLink, amount: amount }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        const result = data.stepByStepRecipe;
-        const cheerioAPI = cheerio.load(result);
-        let steps: string[] = [];
-        cheerioAPI('step').each((i, el) => {
-          const step = cheerioAPI(el).html();
-          if (step) steps.push(step);
-        });
-        if (steps.length > 0) setRecipeInstructions(steps);
-        else {
-          console.log(data);
-          setError('Anleitung konnte nicht generiert werden');
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        setError(err.message);
-      })
-      .then(() => setLoading(false));
+
+    try {
+      let fetchRecipe = await fetch('/api/recipe', {
+        method: 'POST',
+        body: JSON.stringify({ url: recipeLink, amount: amount }),
+      });
+      let recipeResult: RecipeResult = await fetchRecipe.json();
+      console.log(recipeResult);
+      if (recipeResult.error) throw new Error(recipeResult.error);
+
+      let fetchSteps = await fetch('/api/instructions', {
+        method: 'POST',
+        body: JSON.stringify({
+          recipe: recipeResult.recipe,
+          ingredients: recipeResult.ingredients,
+        }),
+      });
+      let stepsResult: StepResults = await fetchSteps.json();
+      if (stepsResult.error) throw new Error(stepsResult.error);
+      console.log(stepsResult.steps);
+
+      if (stepsResult.steps.length > 0)
+        setRecipeInstructions(stepsResult.steps);
+    } catch (err: any) {
+      console.error(err.message);
+      setError('Anleitung konnte nicht generiert werden');
+    }
+    setLoading(false);
   };
 
   return (
@@ -83,7 +98,7 @@ export default function Home() {
         <button
           disabled={loading}
           onClick={handleGenerateInstructions}
-          className="self-end h-14 px-4 py-2 bg-[#3B8047] hover:bg-green-900 text-white rounded-md"
+          className="self-end leading-none h-14 px-4 py-2 bg-[#3B8047] hover:bg-green-900 text-white rounded-md"
         >
           Anleitung generieren
         </button>

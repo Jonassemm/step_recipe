@@ -1,6 +1,5 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import OpenAI from 'openai';
 
 export async function POST(request: Request) {
   // Extract the recipe ID from the request body
@@ -47,8 +46,6 @@ export async function POST(request: Request) {
     ingredients.push(ingredient);
   });
 
-  const ingredientsString = 'Ingredients: {' + ingredients.join('; ') + '}';
-
   let recipe = cheerioAPI('[data-vars-tracking-title="Zubereitung"]')
     .parent()
     .find('.ds-box')
@@ -59,7 +56,7 @@ export async function POST(request: Request) {
   //remove all line breaks
   recipe = recipe.replace(/\r?\n|\r/g, ' ');
 
-  if (!recipe || !ingredientsString) {
+  if (!recipe || ingredients.length == 0) {
     return Response.json({
       error: 'Invalid Recipe',
     });
@@ -69,37 +66,4 @@ export async function POST(request: Request) {
     ingredients: ingredients,
     recipe: recipe,
   });
-
-  /*   const openai = new OpenAI({
-    apiKey: process.env.OPENAI_KEY,
-  });
-
-  let userMessage = `Give a detailed step by step instruction how to cook this recipe. Include exact measurements of ingredients in instructions.  Ignore anything that is not a cooking instruction. Don't omit any measurements. Direct answer in markup with this exact format: <step>Chop <b>1</b> onion</step>. Answer in german. ${ingredientsString} Recipe: {${recipe}}`;
-
-  let chatResponse;
-  try {
-    const chatCompletion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-1106',
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are a cooking assistant helping a user with a precise step by step instruction on how to cook a meal. All measurements are included in the steps. Your answer in markup format. Example: <step>Chop <b>1</b> onion</step>',
-        },
-        { role: 'user', content: userMessage },
-      ],
-      max_tokens: 1000,
-    });
-
-    chatResponse = chatCompletion.choices[0].message.content;
-  } catch (error) {
-    return Response.json({
-      error: 'OpenAI Error',
-    });
-  }
-
-  //return recipe
-  return Response.json({
-    stepByStepRecipe: chatResponse,
-  }); */
 }
