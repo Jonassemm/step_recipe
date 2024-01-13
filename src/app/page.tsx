@@ -69,8 +69,9 @@ export default function Home() {
       <h1 className="text-5xl sm:text-6xl font-bold text-center">
         Schritt für Schritt
       </h1>
-      <h2 className="text-xl sm:text-3xl mt-3 text-center text-gray-500">
-        Jedes Chefkoch Rezept als konkrete Schritt-für-Schritt Anleitung
+      <h2 className="text-xl sm:text-3xl mt-3 text-center text-gray-600">
+        Jedes <b>Chefkoch.de</b> Rezept als einfache Schritt für Schritt
+        Anleitung
       </h2>
       <div className="flex flex-col grow w-full ">
         <div
