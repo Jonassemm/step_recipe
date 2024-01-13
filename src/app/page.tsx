@@ -10,17 +10,22 @@ interface RecipeResult {
   error?: string;
 }
 
-interface StepResults {
-  steps: Array<string>;
-  error?: string;
-}
-
 export default function Home() {
   const [recipeLink, setRecipeLink] = useState('');
   const [recipeInstructions, setRecipeInstructions] = useState(Array<string>);
   const [amount, setAmount] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(String);
+
+  const processSteps = (stepsString: string) => {
+    const cheerioAPI = cheerio.load(stepsString);
+    let steps: Array<string> = [];
+    cheerioAPI('step').each((i, el) => {
+      const step = cheerioAPI(el).html();
+      if (step) steps.push(step);
+    });
+    setRecipeInstructions(steps);
+  };
 
   const handleGenerateInstructions = async () => {
     setLoading(true);
@@ -33,8 +38,6 @@ export default function Home() {
         body: JSON.stringify({ url: recipeLink, amount: amount }),
       });
       let recipeResult: RecipeResult = await fetchRecipe.json();
-      console.log(recipeResult);
-      if (recipeResult.error) throw new Error(recipeResult.error);
 
       let fetchSteps = await fetch('/api/instructions', {
         method: 'POST',
@@ -43,12 +46,9 @@ export default function Home() {
           ingredients: recipeResult.ingredients,
         }),
       });
-      let stepsResult: StepResults = await fetchSteps.json();
-      if (stepsResult.error) throw new Error(stepsResult.error);
-      console.log(stepsResult.steps);
 
-      if (stepsResult.steps.length > 0)
-        setRecipeInstructions(stepsResult.steps);
+      let stepsResult = await fetchSteps.text();
+      if (stepsResult) processSteps(stepsResult);
     } catch (err: any) {
       console.error(err.message);
       setError('Anleitung konnte nicht generiert werden');

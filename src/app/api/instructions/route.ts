@@ -1,7 +1,14 @@
 import OpenAI from 'openai';
 import * as cheerio from 'cheerio';
+import { OpenAIStream, StreamingTextResponse } from 'ai';
+import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_KEY,
+});
 
 export async function POST(request: Request) {
   const requestBody = await request.json();
@@ -15,21 +22,22 @@ export async function POST(request: Request) {
     !recipe ||
     typeof recipe !== 'string'
   ) {
-    return Response.json({
-      error: 'Invalid request body',
-    });
+    return NextResponse.json(
+      {
+        error: 'Invalid request body',
+      },
+      {
+        status: 500,
+      }
+    );
   }
-
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_KEY,
-  });
 
   const ingredientsString = 'Ingredients: {' + ingredients.join('; ') + '}';
   let userMessage = `${ingredientsString}; Recipe: {${recipe}} Include exact measurements of every ingredient in instructions. Direct answer in markup with this exact format: <step>Chop <b>1</b> onion</step>. Answer in german.`;
 
-  let chatResponse: string;
+  let chatCompletionStream;
   try {
-    const chatCompletion = await openai.chat.completions.create({
+    chatCompletionStream = await openai.chat.completions.create({
       model: 'gpt-4-1106-preview',
       messages: [
         {
@@ -41,37 +49,21 @@ export async function POST(request: Request) {
       ],
       max_tokens: 1000,
       temperature: 0.1,
+      stream: true,
     });
 
-    chatResponse = chatCompletion.choices[0].message.content || '';
+    const stream = OpenAIStream(chatCompletionStream, {
+      async onCompletion(completion) {},
+    });
+    return new StreamingTextResponse(stream);
   } catch (error) {
-    return Response.json({
-      error: 'OpenAI Error',
-    });
+    return NextResponse.json(
+      {
+        error: 'OpenAI Error',
+      },
+      {
+        status: 500,
+      }
+    );
   }
-
-  if (!chatResponse) {
-    return Response.json({
-      error: 'OpenAI Error: No response',
-    });
-  }
-
-  const cheerioAPI = cheerio.load(chatResponse);
-  let steps: Array<string> = [];
-
-  cheerioAPI('step').each((i, el) => {
-    const step = cheerioAPI(el).html();
-    if (step) steps.push(step);
-  });
-
-  if (!steps || steps.length === 0) {
-    return Response.json({
-      error: 'OpenAI Error: Invalid format',
-    });
-  }
-
-  //return recipe
-  return Response.json({
-    steps: steps,
-  });
 }

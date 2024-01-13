@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "ai": "^2.2.31",
     "axios": "^1.6.5",
     "cheerio": "^1.0.0-rc.12",
     "next": "14.0.4",
