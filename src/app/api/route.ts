@@ -2,6 +2,8 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import OpenAI from 'openai';
 
+export const runtime = 'edge';
+
 export async function POST(request: Request) {
   // Extract the recipe ID from the request body
   const requestBody = await request.json();
