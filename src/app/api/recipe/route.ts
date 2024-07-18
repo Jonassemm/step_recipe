@@ -1,4 +1,3 @@
-import { kv } from '@vercel/kv';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { NextResponse } from 'next/server';
@@ -26,9 +25,6 @@ export async function POST(request: Request) {
   if (amount) {
     match_url += '?portionen=' + amount;
   }
-
-  //set the queried url to the kv store
-  await kv.set('queriedUrl', match_url);
 
   // Fetch the recipe page
   let pageResult;

@@ -33,7 +33,7 @@ export default function Instruction(props: InstructionProps) {
         />
       </div>
       <div>
-        <input type="checkbox" className="h-6 w-6" checked={checked} />
+        <input type="checkbox" className="h-6 w-6" checked={checked} onChange={()=> setChecked(!checked)} />
       </div>
     </li>
   );
